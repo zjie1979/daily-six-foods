@@ -1,7 +1,7 @@
 {
   "name": "每日六样",
   "short_name": "每日六样",
-  "description": "每天完成六样食物，每次只吃一样并记录重量，可自由修改。",
+  "description": "每天完成六样食物，每次只吃一样，其中两样固定为液体。",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",

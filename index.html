@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#0b1f33">
-  <meta name="description" content="每天完成六样食物，每次只吃一样并记录重量，可自由修改。">
+  <meta name="description" content="每天完成六样食物，每次只吃一样；其中两样固定为液体，内容可自由修改。">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="每日六样">
@@ -53,7 +53,10 @@
     .food:active{transform:scale(.985)}
     .food:focus-visible,.nav:focus-visible,.primary:focus-visible,.secondary:focus-visible{outline:3px solid rgba(255,200,87,.65);outline-offset:2px}
     .food .emoji{width:52px;height:52px;display:grid;place-items:center;background:var(--cream);border-radius:15px;font-size:1.65rem}
+    .food-title{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px}
     .food strong{display:block;font-size:1rem;margin-bottom:4px}
+    .food-title strong{margin:0}
+    .kind-badge{display:inline-flex;align-items:center;width:max-content;border-radius:999px;background:#e8f6ff;color:#17658c;border:1px solid #b8deef;padding:3px 7px;font-size:.68rem;font-style:normal;font-weight:850;line-height:1}
     .food small{display:block;color:var(--muted);font-size:.8rem;line-height:1.35}
     .check{width:30px;height:30px;border-radius:50%;border:2px solid #b9c7cf;display:grid;place-items:center;color:white;font-weight:900}
     .food.done{background:#eef9f2;border-color:#b7e3c8;cursor:default}
@@ -77,6 +80,7 @@
     .field input:focus{border-color:var(--amber-dark);box-shadow:0 0 0 3px rgba(255,200,87,.22)}
     .field+.field{margin-top:10px}
     .emoji-input{text-align:center;font-size:1.5rem;padding-left:6px!important;padding-right:6px!important}
+    .edit-kind{display:flex;justify-content:center;margin-top:8px}
     .save-bar{position:sticky;bottom:92px;background:linear-gradient(180deg,rgba(255,253,248,0),var(--paper) 24%);padding:24px 0 4px;margin-top:4px}
     .save-bar .primary{width:100%}
     .history-list{display:grid;gap:10px}
@@ -99,13 +103,6 @@
     .dialog-food{width:72px;height:72px;display:grid;place-items:center;margin:0 auto 13px;border-radius:22px;background:var(--cream);font-size:2.35rem}
     .dialog-body h2{text-align:center;margin:0 0 7px;font-size:1.32rem}
     .dialog-body p{text-align:center;margin:0;color:var(--muted);line-height:1.55;font-size:.9rem}
-    .weight-field{margin:18px 0 0}
-    .weight-field label{display:block;margin:0 0 7px;font-size:.82rem;font-weight:800;color:var(--ink)}
-    .weight-control{display:grid;grid-template-columns:1fr 58px;align-items:center;border:2px solid #cad5db;border-radius:16px;background:white;overflow:hidden;transition:.18s ease}
-    .weight-control:focus-within{border-color:var(--amber-dark);box-shadow:0 0 0 4px rgba(255,200,87,.2)}
-    .weight-control input{width:100%;min-width:0;border:0;outline:0;background:transparent;padding:13px 10px 13px 15px;color:var(--ink);font-size:1.15rem;font-weight:850}
-    .weight-control span{border-left:1px solid var(--line);text-align:center;color:var(--muted);font-weight:800}
-    .weight-error{min-height:20px;margin-top:5px!important;color:#a23f29!important;text-align:left!important;font-size:.78rem!important}
     .dialog-actions{display:grid;grid-template-columns:1fr 1.25fr;gap:9px;margin-top:20px}
     .toast{position:fixed;left:50%;bottom:105px;z-index:9;transform:translate(-50%,20px);background:var(--ink);color:white;padding:11px 15px;border-radius:999px;font-size:.84rem;font-weight:700;opacity:0;pointer-events:none;transition:.22s ease;white-space:nowrap;box-shadow:var(--shadow)}
     .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -126,7 +123,7 @@
           <div class="ring" id="ring"><strong id="score">0/6</strong></div>
           <div><h2 id="progressTitle">从第一样开始</h2><p>今天完成六样就收工，顺序由你决定。</p></div>
         </section>
-        <div class="rule"><div class="rule-icon">1</div><div><strong>一次只吃一样</strong><span>每次只记录一个食物和它的重量，不把几样混在一起。</span></div></div>
+        <div class="rule"><div class="rule-icon">1</div><div><strong>一次只吃一样</strong><span>前两样固定为液体；每次只确认一样，不把几样混在一起。</span></div></div>
         <div class="section-label"><h2>今天要吃的六样</h2><span>点一项打卡</span></div>
         <div class="food-list" id="foodList"></div>
         <div class="actions">
@@ -136,7 +133,7 @@
       </section>
 
       <section class="view" id="customView" hidden>
-        <div class="page-head"><div class="eyebrow">CUSTOMIZE</div><h2>自定义你的六样</h2><p>名称、图标和简单吃法都能改。保存后从今天起使用新内容，已有打卡不会丢失。</p></div>
+        <div class="page-head"><div class="eyebrow">CUSTOMIZE</div><h2>自定义你的六样</h2><p>前两样固定为液体，其余四样为普通食物。名称、图标和简单吃法都能改，已有打卡不会丢失。</p></div>
         <form id="customForm">
           <div class="edit-list" id="editList"></div>
           <div class="save-bar"><button class="primary" type="submit">保存六样</button></div>
@@ -161,14 +158,9 @@
       <div class="dialog-food" id="dialogEmoji"></div>
       <h2 id="confirmTitle"></h2>
       <p id="dialogNote"></p>
-      <div class="weight-field">
-        <label for="weightInput">这次吃了多少克？</label>
-        <div class="weight-control"><input id="weightInput" type="number" inputmode="decimal" min="0.1" max="10000" step="0.1" placeholder="例如 150" autocomplete="off"><span>克</span></div>
-        <p class="weight-error" id="weightError" role="alert"></p>
-      </div>
       <div class="dialog-actions">
         <button class="secondary" id="cancelConfirm">先不吃</button>
-        <button class="primary" id="confirmEat">记录这一样</button>
+        <button class="primary" id="confirmEat">确认吃这一样</button>
       </div>
     </div>
   </dialog>
@@ -180,12 +172,16 @@
       'use strict';
       const STORAGE_KEY='dailySix.v1';
       const DEFAULT_FOODS=[
-        {id:'food-1',emoji:'🍠',name:'红薯',note:'蒸或烤，简单吃'},
-        {id:'food-2',emoji:'🥚',name:'鸡蛋',note:'水煮蛋或蒸蛋'},
-        {id:'food-3',emoji:'🥣',name:'酸奶燕麦',note:'无糖酸奶配燕麦'},
-        {id:'food-4',emoji:'🥦',name:'绿色蔬菜',note:'清炒、白灼或凉拌'},
-        {id:'food-5',emoji:'◻️',name:'豆腐',note:'煎、炖或凉拌'},
-        {id:'food-6',emoji:'🍌',name:'香蕉',note:'一根即可'}
+        {id:'food-1',kind:'liquid',emoji:'🥛',name:'液体一',note:'牛奶、豆浆或其他饮品'},
+        {id:'food-2',kind:'liquid',emoji:'🥤',name:'液体二',note:'蔬菜汁、清汤或其他饮品'},
+        {id:'food-3',kind:'food',emoji:'🥣',name:'酸奶燕麦',note:'无糖酸奶配燕麦'},
+        {id:'food-4',kind:'food',emoji:'🥦',name:'绿色蔬菜',note:'清炒、白灼或凉拌'},
+        {id:'food-5',kind:'food',emoji:'◻️',name:'豆腐',note:'煎、炖或凉拌'},
+        {id:'food-6',kind:'food',emoji:'🍌',name:'香蕉',note:'一根即可'}
+      ];
+      const LEGACY_DEFAULTS=[
+        {emoji:'🍠',name:'红薯',note:'蒸或烤，简单吃'},
+        {emoji:'🥚',name:'鸡蛋',note:'水煮蛋或蒸蛋'}
       ];
 
       const $=selector=>document.querySelector(selector);
@@ -199,8 +195,6 @@
       const makeId=()=>`entry-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       const clean=value=>String(value??'').trim();
       const escapeHtml=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
-      const validWeight=value=>Number.isFinite(Number(value))&&Number(value)>0&&Number(value)<=10000;
-      const formatWeight=value=>validWeight(value)?`${Number(value).toLocaleString('zh-CN',{maximumFractionDigits:1})}克`:'重量未记录';
       const formatTime=value=>{
         const date=new Date(value);return Number.isNaN(date.getTime())?'':new Intl.DateTimeFormat('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false}).format(date);
       };
@@ -209,21 +203,26 @@
         let parsed={};
         try{parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')||{}}catch{}
         const foods=Array.isArray(parsed.foods)&&parsed.foods.length===6
-          ? parsed.foods.map((food,index)=>({id:clean(food.id)||`food-${index+1}`,emoji:clean(food.emoji)||'●',name:clean(food.name)||`第 ${index+1} 样`,note:clean(food.note)}))
+          ? parsed.foods.map((food,index)=>{
+              const legacy=LEGACY_DEFAULTS[index];
+              const wasLegacyLiquidSlot=Boolean(legacy&&clean(food.emoji)===legacy.emoji&&clean(food.name)===legacy.name&&clean(food.note)===legacy.note);
+              const source=wasLegacyLiquidSlot?DEFAULT_FOODS[index]:food;
+              return {id:clean(source.id)||`food-${index+1}`,kind:index<2?'liquid':'food',emoji:clean(source.emoji)||'●',name:clean(source.name)||`第 ${index+1} 样`,note:clean(source.note)};
+            })
           : DEFAULT_FOODS.map(food=>({...food}));
         const days=parsed.days&&typeof parsed.days==='object'?parsed.days:{};
         Object.keys(days).forEach(date=>{
           if(Array.isArray(days[date])){
-            days[date]={entries:days[date].map((value,index)=>({id:makeId(),foodId:typeof value==='number'?(foods[value]?.id||foods[index]?.id):value,time:new Date().toISOString(),weightGrams:null})).filter(item=>item.foodId)};
+            days[date]={entries:days[date].map((value,index)=>({id:makeId(),foodId:typeof value==='number'?(foods[value]?.id||foods[index]?.id):value,time:new Date().toISOString()})).filter(item=>item.foodId)};
           }
           if(!Array.isArray(days[date]?.entries))days[date]={entries:[]};
           days[date].entries=days[date].entries.map(entry=>({
             id:clean(entry.id)||makeId(),
             foodId:clean(entry.foodId),
             time:entry.time||new Date().toISOString(),
-            weightGrams:validWeight(entry.weightGrams)?Number(entry.weightGrams):null,
             foodName:clean(entry.foodName),
-            foodEmoji:clean(entry.foodEmoji)
+            foodEmoji:clean(entry.foodEmoji),
+            foodKind:clean(entry.foodKind)
           })).filter(entry=>entry.foodId);
         });
         return {foods,days};
@@ -266,8 +265,9 @@
         $('#foodList').innerHTML=state.foods.map((food,index)=>{
           const entry=day.entries.find(item=>item.foodId===food.id);
           const isDone=Boolean(entry);
-          const detail=isDone?`${validWeight(entry.weightGrams)?`已记录 ${formatWeight(entry.weightGrams)}`:'已完成 · 重量未记录'}${formatTime(entry.time)?` · ${formatTime(entry.time)}`:''}`:(food.note||'按自己的方式吃');
-          return `<button class="food ${isDone?'done':''}" data-food-id="${escapeHtml(food.id)}" aria-pressed="${isDone}" ${isDone?'disabled':''}><span class="emoji">${escapeHtml(food.emoji)}</span><span><strong>${index+1}. ${escapeHtml(food.name)}</strong><small>${escapeHtml(detail)}</small></span><span class="check" aria-hidden="true"></span></button>`;
+          const detail=isDone?`已完成${formatTime(entry.time)?` · ${formatTime(entry.time)}`:''}`:(food.note||'按自己的方式吃');
+          const badge=food.kind==='liquid'?'<em class="kind-badge">液体</em>':'';
+          return `<button class="food ${isDone?'done':''}" data-food-id="${escapeHtml(food.id)}" aria-pressed="${isDone}" ${isDone?'disabled':''}><span class="emoji">${escapeHtml(food.emoji)}</span><span><span class="food-title"><strong>${index+1}. ${escapeHtml(food.name)}</strong>${badge}</span><small>${escapeHtml(detail)}</small></span><span class="check" aria-hidden="true"></span></button>`;
         }).join('');
         $$('.food:not(:disabled)').forEach(button=>button.addEventListener('click',()=>openConfirm(button.dataset.foodId)));
         $('#undoButton').disabled=day.entries.length===0;
@@ -275,7 +275,7 @@
       }
 
       function renderCustom(){
-        $('#editList').innerHTML=state.foods.map((food,index)=>`<section class="edit-card"><div class="field"><label for="emoji-${index}">图标</label><input class="emoji-input" id="emoji-${index}" name="emoji-${index}" value="${escapeHtml(food.emoji)}" maxlength="4" aria-label="第 ${index+1} 样图标"></div><div><div class="field"><label for="name-${index}">第 ${index+1} 样名称</label><input id="name-${index}" name="name-${index}" value="${escapeHtml(food.name)}" maxlength="18" required></div><div class="field"><label for="note-${index}">简单吃法（可不填）</label><input id="note-${index}" name="note-${index}" value="${escapeHtml(food.note)}" maxlength="36"></div></div></section>`).join('');
+        $('#editList').innerHTML=state.foods.map((food,index)=>`<section class="edit-card"><div><div class="field"><label for="emoji-${index}">图标</label><input class="emoji-input" id="emoji-${index}" name="emoji-${index}" value="${escapeHtml(food.emoji)}" maxlength="4" aria-label="第 ${index+1} 样图标"></div>${food.kind==='liquid'?'<div class="edit-kind"><span class="kind-badge">固定液体</span></div>':''}</div><div><div class="field"><label for="name-${index}">第 ${index+1} 样名称</label><input id="name-${index}" name="name-${index}" value="${escapeHtml(food.name)}" maxlength="18" required></div><div class="field"><label for="note-${index}">简单吃法（可不填）</label><input id="note-${index}" name="note-${index}" value="${escapeHtml(food.note)}" maxlength="36"></div></div></section>`).join('');
       }
 
       function renderHistory(){
@@ -285,13 +285,12 @@
           const day=state.days[key];
           const ids=[...new Set(day.entries.map(entry=>entry.foodId))];
           const count=Math.min(ids.length,6);
-          const total=day.entries.reduce((sum,entry)=>sum+(validWeight(entry.weightGrams)?Number(entry.weightGrams):0),0);
           const entries=day.entries.map(entry=>{
             const current=foodById(entry.foodId);
-            return {emoji:entry.foodEmoji||current?.emoji||'●',name:entry.foodName||current?.name||'已记录食物',weightGrams:entry.weightGrams};
+            return {emoji:entry.foodEmoji||current?.emoji||'●',name:entry.foodName||current?.name||'已记录食物'};
           });
           const summary=count===6?'已完成':`完成 ${count}/6`;
-          return `<article class="day-card"><div class="day-row"><strong>${escapeHtml(formatDate(key))}</strong><span>${escapeHtml(summary)}${total?` · 共 ${escapeHtml(formatWeight(total))}`:''}</span></div><div class="mini-progress"><i style="width:${count/6*100}%"></i></div>${entries.length?`<div class="history-foods">${entries.map(entry=>`<span>${escapeHtml(entry.emoji)} ${escapeHtml(entry.name)} · ${escapeHtml(formatWeight(entry.weightGrams))}</span>`).join('')}</div>`:''}</article>`;
+          return `<article class="day-card"><div class="day-row"><strong>${escapeHtml(formatDate(key))}</strong><span>${escapeHtml(summary)}</span></div><div class="mini-progress"><i style="width:${count/6*100}%"></i></div>${entries.length?`<div class="history-foods">${entries.map(entry=>`<span>${escapeHtml(entry.emoji)} ${escapeHtml(entry.name)}</span>`).join('')}</div>`:''}</article>`;
         }).join('');
       }
 
@@ -302,34 +301,28 @@
         pendingFoodId=foodId;
         $('#dialogEmoji').textContent=food.emoji;
         $('#confirmTitle').textContent=`这次只吃：${food.name}`;
-        $('#dialogNote').textContent=food.note||'确认后会记入今天的进度。';
-        $('#weightInput').value='';
-        $('#weightError').textContent='';
+        $('#dialogNote').textContent=`${food.kind==='liquid'?'固定液体 · ':''}${food.note||'确认后会记入今天的进度。'}`;
         $('#confirmDialog').showModal();
-        window.setTimeout(()=>$('#weightInput').focus(),50);
       }
 
-      function recordFood(foodId,weightGrams){
+      function recordFood(foodId){
         const day=getToday();
         const food=foodById(foodId);
         if(!food)throw new Error('没有找到这一样食物');
         if(day.entries.some(entry=>entry.foodId===foodId))throw new Error('今天已经吃过这一样');
-        if(!validWeight(weightGrams))throw new Error('请输入正确的重量，范围为 0.1–10000 克');
-        day.entries.push({id:makeId(),foodId,time:new Date().toISOString(),weightGrams:Number(weightGrams),foodName:food.name,foodEmoji:food.emoji});
+        day.entries.push({id:makeId(),foodId,time:new Date().toISOString(),foodName:food.name,foodEmoji:food.emoji,foodKind:food.kind});
         saveState();renderToday();renderHistory();
-        return {date:localDateKey(),foodId,weightGrams:Number(weightGrams),completed:completedIds(day).size,total:6};
+        return {date:localDateKey(),foodId,completed:completedIds(day).size,total:6};
       }
 
       $('#confirmEat').addEventListener('click',()=>{
         if(!pendingFoodId)return;
         try{
-          const food=foodById(pendingFoodId);const result=recordFood(pendingFoodId,$('#weightInput').value);
+          const food=foodById(pendingFoodId);const result=recordFood(pendingFoodId);
           $('#confirmDialog').close();pendingFoodId=null;
-          showToast(result.completed===6?'今天六样全部完成！':`${food.name} ${formatWeight(result.weightGrams)} · ${result.completed}/6`);
-        }catch(error){$('#weightError').textContent=error.message;$('#weightInput').focus()}
+          showToast(result.completed===6?'今天六样全部完成！':`${food.name} 已完成 · ${result.completed}/6`);
+        }catch(error){showToast(error.message)}
       });
-      $('#weightInput').addEventListener('input',()=>{$('#weightError').textContent='';});
-      $('#weightInput').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();$('#confirmEat').click();}});
       $('#cancelConfirm').addEventListener('click',()=>{$('#confirmDialog').close();pendingFoodId=null;});
       $('#confirmDialog').addEventListener('click',event=>{if(event.target===$('#confirmDialog')){$('#confirmDialog').close();pendingFoodId=null;}});
 
@@ -384,13 +377,13 @@
             name:'get_daily_six_progress',title:'查看每日六样进度',description:'读取今天六样食物的完成情况，不修改记录。',
             inputSchema:{type:'object',properties:{},additionalProperties:false},
             annotations:{readOnlyHint:true,untrustedContentHint:false},
-            execute(){const day=getToday();const done=completedIds(day);return {date:localDateKey(),completed:done.size,total:6,remaining:state.foods.filter(food=>!done.has(food.id)).map(food=>({id:food.id,name:food.name}))};}
+            execute(){const day=getToday();const done=completedIds(day);return {date:localDateKey(),completed:done.size,total:6,remaining:state.foods.filter(food=>!done.has(food.id)).map(food=>({id:food.id,name:food.name,kind:food.kind}))};}
           })).catch(report);
           void Promise.resolve(context.registerTool({
-            name:'record_one_food',title:'记录吃了一样',description:'为今天记录一个指定食物及其克重。每次调用只记录一样，已完成的食物不会重复记录。',
-            inputSchema:{type:'object',properties:{foodId:{type:'string',enum:state.foods.map(food=>food.id)},weightGrams:{type:'number',exclusiveMinimum:0,maximum:10000}},required:['foodId','weightGrams'],additionalProperties:false},
+            name:'record_one_food',title:'记录吃了一样',description:'为今天记录一个指定食物。每次调用只记录一样，已完成的食物不会重复记录。',
+            inputSchema:{type:'object',properties:{foodId:{type:'string',enum:state.foods.map(food=>food.id)}},required:['foodId'],additionalProperties:false},
             annotations:{readOnlyHint:false,untrustedContentHint:false},
-            execute(input){if(!input||typeof input.foodId!=='string'||!validWeight(input.weightGrams))throw new Error('需要提供 foodId 和正确的 weightGrams');const result=recordFood(input.foodId,input.weightGrams);showToast(`${foodById(input.foodId).name} ${formatWeight(input.weightGrams)} 已记下`);return result;}
+            execute(input){if(!input||typeof input.foodId!=='string')throw new Error('需要提供 foodId');const result=recordFood(input.foodId);showToast(`${foodById(input.foodId).name} 已记下`);return result;}
           })).catch(report);
         }catch(error){report(error)}
       }
